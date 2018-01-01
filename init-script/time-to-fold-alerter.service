@@ -1,0 +1,10 @@
+ [Unit]
+ Description=Time to fold alerter
+ After=multi-user.target
+
+ [Service]
+ ExecStart=/home/pi/adxl354/time-to-fold-alerter/time_to_fold_alerter.py "https://notificationurl.com"
+
+ [Install]
+ WantedBy=multi-user.target
+

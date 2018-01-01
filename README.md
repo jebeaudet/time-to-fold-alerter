@@ -41,7 +41,11 @@ optional arguments:
 ```
 
 ## Install as a service
-An init script is supplied in the `/init-script` directory. To use it, change the `DIR` variable to point to the location of the script and change the `DAEMON_OPTS` variable to put your notification url and optional arguments.
+A SystemD script is supplied in the `init-script` directory. To use it, modify the `ExecStart` command to add the notification url and the optional arguments. Set the right permissions (`sudo chmod 644 time-to-fold-alerter.service`) and copy the file in the `/lib/systemd/system/` directory. Enable the service and reboot : 
+```
+sudo systemctl daemon-reload
+sudo systemctl enable time-to-fold-alerter.service
+```
 
 # How does it work?
 The script uses a very simple state machine since the pi is not really suitable for complex live FFT calculations. It uses the following algorithm : 

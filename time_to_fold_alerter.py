@@ -7,6 +7,7 @@ import math
 import logging
 import argparse
 import signal
+import sys
 
 class SignalHandler():
     running = True
@@ -62,7 +63,7 @@ consecutive_counter=0
 idle_threshold = args.idle_threshold
 notification_url = args.notification_url
 
-logger.info("Alerter launched, monitoring for movement now.")
+logger.info("Alerter launched, monitoring for movement now. Idle threshold : %s. ADXL address : %s. Verbose log : %s. Notication url : %s.", idle_threshold, args.address, args.verbose, notification_url)
 signal_handler = SignalHandler()
 while(signal_handler.running):
     if not working:
@@ -91,3 +92,4 @@ while(signal_handler.running):
         working = False
 
 logger.info("Caught SIGTERM or SIGINT, exiting.")
+sys.exit(0)
