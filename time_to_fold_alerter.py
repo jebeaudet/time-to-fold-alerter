@@ -7,7 +7,6 @@ import math
 import logging
 import argparse
 import signal
-import sys
 
 class SignalHandler():
     running = True
@@ -55,7 +54,7 @@ args = parser.parse_args()
 sensor = ADXL345(args.address)
 #sensor = ADXL345(0x1d)
 
-logging.basicConfig(filename=sys.path[0] + "/time_to_fold_alerter.log", level=logging.DEBUG if args.verbose else logging.INFO, format="%(asctime)-15s %(message)s")
+logging.basicConfig(filename="/var/log/time_to_fold_alerter.log", level=logging.DEBUG if args.verbose else logging.INFO, format="%(asctime)-15s %(message)s")
 logger = logging.getLogger("time_to_fold_alerter")
 
 working = False
