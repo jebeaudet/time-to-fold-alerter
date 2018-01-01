@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from adxl345 import ADXL345
 import time
 import urllib2
