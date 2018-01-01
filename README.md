@@ -12,18 +12,18 @@ All the steps mentioned here should be executed on the raspberry pi.
 
 ## Install the script
 1. Clone the [repository](https://github.com/jebeaudet/time-to-fold-alerter)
-2. Run with `python time_to_fold_alerter.py https://api.telegram.org/botxxxx/sendMessage?chat_id=xxxxxx&text=Done`
+2. Run with `sudo ./time_to_fold_alerter.py https://api.telegram.org/botxxxx/sendMessage?chat_id=xxxxxx&text=Done` (sudo is required for writing to `/var/log`)
 
 ## Optional configuration
-On the first run, you can run with the `-v` flag and this will output relevant information in the log file (`{SCRIPT_LOCATION}/time_to_fold_alerter.py`) such as the maximum acceleration detected in the idle phase detection. You can also configure the idle threshold that is used to detect movement with the `-i` flag.
+On the first run, you can run with the `-v` flag and this will output relevant information in the log file (`/var/log/time_to_fold_alerter.py`) such as the maximum acceleration detected in the idle phase detection. You can also configure the idle threshold that is used to detect movement with the `-i` flag.
 
 Help is also available with `python time_to_fold_alerter.py -h` : 
 ```
-$ python time_to_fold_alerter.py -h
+$ ./time_to_fold_alerter.py -h
 usage: time_to_fold_alerter.py [-h] [-v] [-i IDLE_THRESHOLD] [-a ADDRESS] notification_url
 
 Washing machine/dryer action detector. Logs are in
-{SCRIPT_LOCATION}/time_to_fold_alerter.log.
+/var/log/time_to_fold_alerter.log.
 
 positional arguments:
   notification_url      the url to send the notification to via a GET
@@ -39,6 +39,11 @@ optional arguments:
                         useful when you use multiple sensors on the same board
                         (default: 0x53)
 ```
+
+## Install as a service
+An init script is supplied in the `/init-script` directory. To use it, change the `DIR` variable to point to the location of the script and change the `DAEMON_OPTS` variable to put your notification url and optional arguments.
+
+Place the script in the init.d directory (`sudo cp time-to-fold-alerter.sh /etc/init.d`) and install it as a service (`sudo update-rc.d time-to-fold-alerter.sh defaults`).
 
 # How does it work?
 The script uses a very simple state machine since the pi is not really suitable for complex live FFT calculations. It uses the following algorithm : 
