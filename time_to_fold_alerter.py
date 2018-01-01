@@ -7,7 +7,6 @@ import math
 import logging
 import argparse
 import signal
-import sys
 
 class SignalHandler():
     running = True
