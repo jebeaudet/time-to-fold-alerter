@@ -47,6 +47,8 @@ logger = logging.getLogger("time_to_fold_alerter")
 
 working = False
 consecutive_counter=0
+idle_threshold = args.idle_threshold
+notification_url = args.notification_url
 
 while(True):
     if not working:

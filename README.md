@@ -7,7 +7,8 @@ Make sure you have a functional setup with the ADXL345 and that the sensor is an
 All the steps mentioned here should be executed on the raspberry pi.
 ## Install the driver
 1. Clone the [repository](https://github.com/pimoroni/adxl345-python)
-2. Add the driver path to your `PYTHONPATH` environment variable (`export PYTHONPATH=$PYTHONPATH:/somedirectory/adxl345-python`)
+2. Copy the `adxl345.py` file in the same directory as the script OR
+3. Add the driver path to your `PYTHONPATH` environment variable (`export PYTHONPATH=$PYTHONPATH:/somedirectory/adxl345-python`)
 
 ## Install the script
 1. Clone the [repository](https://github.com/jebeaudet/time-to-fold-alerter)
