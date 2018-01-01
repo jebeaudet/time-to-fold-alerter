@@ -4,6 +4,17 @@ import urllib2
 import math
 import logging
 import argparse
+import signal
+import sys
+
+class SignalHandler():
+    running = True
+    def __init__(self):
+        signal.signal(signal.SIGINT, self.exit_gracefully)
+        signal.signal(signal.SIGTERM, self.exit_gracefully)
+
+    def exit_gracefully(self, signum, frame):
+        self.running = False
 
 def auto_int(x):
     return int(x, 0)
@@ -29,10 +40,10 @@ def validate_movement(number_of_period, sampling_period, idle_threshold):
     return max_acceleration > idle_threshold
 
 
-parser = argparse.ArgumentParser(description="Washing machine/dryer action detector. Logs are in /var/log/time_to_fold_alerter.log.")
+parser = argparse.ArgumentParser(description="Washing machine/dryer action detector. Logs are in {SCRIPT_LOCATION}/time_to_fold_alerter.log.")
 parser.add_argument(dest="notification_url",
                    help="the url to send the notification to via a GET")
-parser.add_argument("-v", "--verbose", action='store_true', help="run the program with debug logs")
+parser.add_argument("-v", "--verbose", action="store_true", help="run the program with debug logs")
 parser.add_argument("-i", "--idle_threshold", dest="idle_threshold", type=float, default=0.1,
                    help="the idle threshold for movement detection (default: %(default)s)")
 parser.add_argument("-a", "--address", dest="address", type=auto_int, default=0x53,
@@ -42,7 +53,7 @@ args = parser.parse_args()
 sensor = ADXL345(args.address)
 #sensor = ADXL345(0x1d)
 
-logging.basicConfig(filename='/var/log/time_to_fold_alerter.log', level=logging.DEBUG if args.verbose else logging.INFO, format="%(asctime)-15s %(message)s")
+logging.basicConfig(filename=sys.path[0] + "/time_to_fold_alerter.log", level=logging.DEBUG if args.verbose else logging.INFO, format="%(asctime)-15s %(message)s")
 logger = logging.getLogger("time_to_fold_alerter")
 
 working = False
@@ -50,7 +61,9 @@ consecutive_counter=0
 idle_threshold = args.idle_threshold
 notification_url = args.notification_url
 
-while(True):
+logger.info("Alerter launched, monitoring for movement now.")
+signal_handler = SignalHandler()
+while(signal_handler.running):
     if not working:
         acceleration = get_maximum_acceleration_on_sample(1)
         logger.debug("Maximum acceleration of '%s' detected for idle detection", acceleration)
@@ -75,3 +88,5 @@ while(True):
         logger.info("All done, sending notification!")
         urllib2.urlopen(notification_url)
         working = False
+
+logger.info("Caught SIGTERM or SIGINT, exiting.")

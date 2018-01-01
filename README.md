@@ -15,7 +15,7 @@ All the steps mentioned here should be executed on the raspberry pi.
 2. Run with `python time_to_fold_alerter.py https://api.telegram.org/botxxxx/sendMessage?chat_id=xxxxxx&text=Done`
 
 ## Optional configuration
-On the first run, you can run with the `-v` flag and this will output relevant information in the log file (`/var/log/time_to_fold_alerter.py`) such as the maximum acceleration detected in the idle phase detection. You can also configure the idle threshold that is used to detect movement with the `-i` flag.
+On the first run, you can run with the `-v` flag and this will output relevant information in the log file (`{SCRIPT_LOCATION}/time_to_fold_alerter.py`) such as the maximum acceleration detected in the idle phase detection. You can also configure the idle threshold that is used to detect movement with the `-i` flag.
 
 Help is also available with `python time_to_fold_alerter.py -h` : 
 ```
@@ -23,7 +23,7 @@ $ python time_to_fold_alerter.py -h
 usage: time_to_fold_alerter.py [-h] [-v] [-i IDLE_THRESHOLD] [-a ADDRESS] notification_url
 
 Washing machine/dryer action detector. Logs are in
-/var/log/time_to_fold_alerter.log.
+{SCRIPT_LOCATION}/time_to_fold_alerter.log.
 
 positional arguments:
   notification_url      the url to send the notification to via a GET
