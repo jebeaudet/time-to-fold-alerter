@@ -1,5 +1,5 @@
 # Time to fold alerter
-A little rough script to detect a washing machine/dryer load and alert you with [Telegram](https://telegram.org/) or any other GET webhook when the load is over. Useful when you don't hear the end of cycle sound. It uses the ADXL345 accelerometer with this [convenient driver](https://github.com/pimoroni/adxl345-python) for raspberry pi.
+A little rough script to detect a washing machine/dryer load and alert you with [Telegram](https://telegram.org/) or any other GET webhook when the load is over (multiple urls are supported). Useful when you don't hear the end of cycle sound. It uses the ADXL345 accelerometer with this [convenient driver](https://github.com/pimoroni/adxl345-python) for raspberry pi (tested with raspberry pi 1).
 
 # How to use
 Make sure you have a functional setup with the ADXL345 and that the sensor is anchored on the machine, ready to measure on the **Z** axis.
@@ -12,7 +12,7 @@ All the steps mentioned here should be executed on the raspberry pi.
 
 ## Install the script
 1. Clone the [repository](https://github.com/jebeaudet/time-to-fold-alerter)
-2. Run with `sudo ./time_to_fold_alerter.py https://api.telegram.org/botxxxx/sendMessage?chat_id=xxxxxx&text=Done` (sudo is required for writing to `/var/log`)
+2. Run with `sudo ./time_to_fold_alerter.py https://api.telegram.org/botxxxx/sendMessage?chat_id=xxxxxx&text=Done https://otherwebhook.com` (sudo is required for writing to `/var/log`)
 
 ## Optional configuration
 On the first run, you can run with the `-v` flag and this will output relevant information in the log file (`/var/log/time_to_fold_alerter.py`) such as the maximum acceleration detected in the idle phase detection. You can also configure the idle threshold that is used to detect movement with the `-i` flag.
@@ -20,13 +20,14 @@ On the first run, you can run with the `-v` flag and this will output relevant i
 Help is also available with `python time_to_fold_alerter.py -h` : 
 ```
 $ ./time_to_fold_alerter.py -h
-usage: time_to_fold_alerter.py [-h] [-v] [-i IDLE_THRESHOLD] [-a ADDRESS] notification_url
+usage: time_to_fold_alerter.py [-h] [-v] [-i IDLE_THRESHOLD] [-a ADDRESS]
+                               notification_urls [notification_urls ...]
 
 Washing machine/dryer action detector. Logs are in
 /var/log/time_to_fold_alerter.log.
 
 positional arguments:
-  notification_url      the url to send the notification to via a GET
+  notification_urls     the url to send the notification to via a GET
 
 optional arguments:
   -h, --help            show this help message and exit

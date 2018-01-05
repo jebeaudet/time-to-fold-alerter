@@ -41,9 +41,9 @@ def validate_movement(number_of_period, sampling_period, idle_threshold):
     return max_acceleration > idle_threshold
 
 
-parser = argparse.ArgumentParser(description="Washing machine/dryer action detector. Logs are in {SCRIPT_LOCATION}/time_to_fold_alerter.log.")
-parser.add_argument(dest="notification_url",
-                   help="the url to send the notification to via a GET")
+parser = argparse.ArgumentParser(description="Washing machine/dryer action detector. Logs are in /var/log/time_to_fold_alerter.log.")
+parser.add_argument(dest="notification_urls", nargs='+',
+                   help="the url(s) to send the notification to via a GET")
 parser.add_argument("-v", "--verbose", action="store_true", help="run the program with debug logs")
 parser.add_argument("-i", "--idle_threshold", dest="idle_threshold", type=float, default=0.1,
                    help="the idle threshold for movement detection (default: %(default)s)")
@@ -60,9 +60,9 @@ logger = logging.getLogger("time_to_fold_alerter")
 working = False
 consecutive_counter=0
 idle_threshold = args.idle_threshold
-notification_url = args.notification_url
+notification_urls = args.notification_urls
 
-logger.info("Alerter launched, monitoring for movement now. Idle threshold : %s. ADXL address : %s. Verbose log : %s. Notication url : %s.", idle_threshold, args.address, args.verbose, notification_url)
+logger.info("Alerter launched, monitoring for movement now. Idle threshold : %s. ADXL address : %s. Verbose log : %s. Notication urls : %s.", idle_threshold, args.address, args.verbose, notification_urls)
 signal_handler = SignalHandler()
 while(signal_handler.running):
     if not working:
@@ -86,8 +86,14 @@ while(signal_handler.running):
             logger.debug("Still working!")
             time.sleep(1)
 
-        logger.info("All done, sending notification!")
-        urllib2.urlopen(notification_url)
+        logger.info("All done, sending notifications!")
+        for notification_url in notification_urls:
+            try:
+                logger.info("Sending notification to '%s'", notification_url)
+                urllib2.urlopen(notification_url)
+            except:
+                logger.exception("Error while sending notification!")
+
         working = False
 
 logger.info("Caught SIGTERM or SIGINT, exiting.")
