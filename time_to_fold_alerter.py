@@ -69,15 +69,18 @@ while(signal_handler.running):
         acceleration = get_maximum_acceleration_on_sample(1)
         logger.debug("Maximum acceleration of '%s' detected for idle detection", acceleration)
         if(acceleration < idle_threshold):
-            logger.debug("No movement detected, sleeping for 10 seconds")
+            if(consecutive_counter != 0):
+                logger.info("False positive for movement, reseting the consecutive movement counter to 0")
+            else:
+                logger.debug("No movement detected, sleeping for 10 seconds")
             time.sleep(10)
             consecutive_counter = 0;
         else:
-            logger.info("Movement possibly detected, incrementing the movement counter.")
             consecutive_counter += 1
+            logger.info("Movement possibly detected, incrementing the movement counter to '%s'", consecutive_counter)
             time.sleep(1)
 
-        if (consecutive_counter > 2):
+        if (consecutive_counter == 3):
             logger.info("We have a washing machine/dryer load!")
             working = True
             consecutive_counter = 0
