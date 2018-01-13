@@ -7,6 +7,7 @@ import math
 import logging
 import argparse
 import signal
+import sys
 
 class SignalHandler():
     running = True
@@ -65,39 +66,44 @@ notification_urls = args.notification_urls
 logger.info("Alerter launched, monitoring for movement now. Idle threshold : %s. ADXL address : %s. Verbose log : %s. Notication urls : %s.", idle_threshold, args.address, args.verbose, notification_urls)
 signal_handler = SignalHandler()
 while(signal_handler.running):
-    if not working:
-        acceleration = get_maximum_acceleration_on_sample(1)
-        logger.debug("Maximum acceleration of '%s' detected for idle detection", acceleration)
-        if(acceleration < idle_threshold):
-            if(consecutive_counter != 0):
-                logger.info("False positive for movement, reseting the consecutive movement counter to 0")
+    try:
+        if not working:
+            acceleration = get_maximum_acceleration_on_sample(1)
+            logger.debug("Maximum acceleration of '%s' detected for idle detection", acceleration)
+            if(acceleration < idle_threshold):
+                if(consecutive_counter != 0):
+                    logger.info("False positive for movement, reseting the consecutive movement counter to 0")
+                else:
+                    logger.debug("No movement detected, sleeping for 10 seconds")
+                time.sleep(10)
+                consecutive_counter = 0;
             else:
-                logger.debug("No movement detected, sleeping for 10 seconds")
-            time.sleep(10)
-            consecutive_counter = 0;
+                consecutive_counter += 1
+                logger.info("Movement possibly detected, incrementing the movement counter to '%s'", consecutive_counter)
+                time.sleep(1)
+
+            if (consecutive_counter == 3):
+                logger.info("We have a washing machine/dryer load!")
+                working = True
+                consecutive_counter = 0
         else:
-            consecutive_counter += 1
-            logger.info("Movement possibly detected, incrementing the movement counter to '%s'", consecutive_counter)
-            time.sleep(1)
+            while(validate_movement(60, 1, idle_threshold)):
+                if not signal_handler.running:
+                    break
+                logger.debug("Still working!")
+                time.sleep(1)
 
-        if (consecutive_counter == 3):
-            logger.info("We have a washing machine/dryer load!")
-            working = True
-            consecutive_counter = 0
-    else:
-        while(validate_movement(60, 1, idle_threshold)):
-            logger.debug("Still working!")
-            time.sleep(1)
+            logger.info("All done, sending notifications!")
+            for notification_url in notification_urls:
+                try:
+                    logger.info("Sending notification to '%s'", notification_url)
+                    urllib2.urlopen(notification_url)
+                except:
+                    logger.exception("Error while sending notification!")
 
-        logger.info("All done, sending notifications!")
-        for notification_url in notification_urls:
-            try:
-                logger.info("Sending notification to '%s'", notification_url)
-                urllib2.urlopen(notification_url)
-            except:
-                logger.exception("Error while sending notification!")
-
-        working = False
+            working = False
+    except:
+        logger.exception("Oops something went terribly wrong!")
 
 logger.info("Caught SIGTERM or SIGINT, exiting.")
 sys.exit(0)
