@@ -29,7 +29,7 @@ def get_maximum_acceleration_on_sample(duration_in_seconds):
             axes = sensor.getAxes(True)
             accelerations.append(math.fabs(axes['z']))
             time.sleep(0.01)
-        except IOException:
+        except IOError:
             logger.exception("Error while sampling from the ADXL354, ignoring")
     return max(accelerations)
 
